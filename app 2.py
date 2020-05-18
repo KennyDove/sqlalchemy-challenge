@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "code",
-   "execution_count": 22,
+   "execution_count": 1,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -21,13 +21,8 @@
    ]
   },
   {
-   "cell_type": "raw",
-   "metadata": {},
-   "source": []
-  },
-  {
    "cell_type": "code",
-   "execution_count": 25,
+   "execution_count": 2,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -58,7 +53,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 28,
+   "execution_count": 8,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -77,21 +72,21 @@
     "        f\"Here is the route for stations:/api/v1.0/stations<br/>\"\n",
     "        f\"Here is the route for tobs: /api/v1.0/tobs<br/>\"\n",
     "        f\"Data breakdown from start date: /api/v1.0/start<br/>\"\n",
-    "        f\"Data breakdown from end date: /api/v1.0/end<br/>\"\n",
+    "        f\"Data breakdown from given dates: /api/v1.0/dates<br/>\"\"\n",
     "    )\n"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 42,
+   "execution_count": 4,
    "metadata": {},
    "outputs": [
     {
      "ename": "SyntaxError",
-     "evalue": "unexpected EOF while parsing (<ipython-input-42-bb4f83f6698e>, line 11)",
+     "evalue": "unexpected EOF while parsing (<ipython-input-4-bb4f83f6698e>, line 11)",
      "output_type": "error",
      "traceback": [
-      "\u001b[0;36m  File \u001b[0;32m\"<ipython-input-42-bb4f83f6698e>\"\u001b[0;36m, line \u001b[0;32m11\u001b[0m\n\u001b[0;31m    return jsonify(pricipitation_data\u001b[0m\n\u001b[0m                                     ^\u001b[0m\n\u001b[0;31mSyntaxError\u001b[0m\u001b[0;31m:\u001b[0m unexpected EOF while parsing\n"
+      "\u001b[0;36m  File \u001b[0;32m\"<ipython-input-4-bb4f83f6698e>\"\u001b[0;36m, line \u001b[0;32m11\u001b[0m\n\u001b[0;31m    return jsonify(pricipitation_data\u001b[0m\n\u001b[0m                                     ^\u001b[0m\n\u001b[0;31mSyntaxError\u001b[0m\u001b[0;31m:\u001b[0m unexpected EOF while parsing\n"
      ]
     }
    ],
@@ -106,12 +101,12 @@
     "        pricipitation_dict[\"prcp\"] = prcp\n",
     "        pricipitation_dict[\"date\"] = date\n",
     "        pricipitation_data.append(prcp_dict)\n",
-    "    return jsonify(pricipitation_data\n"
+    "    return jsonify(pricipitation_data"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 39,
+   "execution_count": 5,
    "metadata": {},
    "outputs": [],
    "source": [
@@ -119,9 +114,79 @@
     "\n",
     "def stations():\n",
     "    results = session.query(station.name, measurement.station).filter(station.station == measurement.station).group_by(station.name).all()\n",
-    "    stations_list =list(np.ravel(stations))\n",
+    "    stations_list =list(np.ravel(stations_search))\n",
     "    return jsonify(station_list)\n",
     "    session.close()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "@app.route(\"/api/v1.0/tobs\")\n",
+    "\n",
+    "def tobservations():\n",
+    "    results = session.query(measurement.date, measurement.tobs).filter(measurement.date).filter(measurement.date > final_fate).filter(Station.name=='WAIHEE 837.5, HI US').all()\n",
+    "    session.close()\n",
+    "    tobs_list = list(np.ravel(tob_search))\n",
+    "    "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "@app.route(\"/api/v1.0/start\")\n",
+    "\n",
+    "def start():\n",
+    "    first_date = dt.datetime.strptime(start, '%Y-%m-%d')\n",
+    "    session = Session(engine)\n",
+    "    temperature = session.query(func.min(measurement.tobs),func.avg(measurement.tobs),func.max(measurement.tobs).filter(measurement.date >= start_date)).all()\n",
+    "    all_temp = []\n",
+    "    for TMIN, TAVG, TMAX in temp:\n",
+    "        temperature_dict = {}\n",
+    "        temperature_dict[\"TMIN\"] = temp[0][0]\n",
+    "        temperature_dict[\"TAVG\"] = temp[0][1]\n",
+    "        temperature_dict[\"TMAX\"] = temp[0][1]\n",
+    "        temperature_collection.append(temp_dict)\n",
+    "    return jsonify(temperature_collection)\n",
+    "session.close()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "SyntaxError",
+     "evalue": "keyword can't be an expression (<ipython-input-14-b616bea648f3>, line 4)",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[0;36m  File \u001b[0;32m\"<ipython-input-14-b616bea648f3>\"\u001b[0;36m, line \u001b[0;32m4\u001b[0m\n\u001b[0;31m    results = session.query(func.min(measurement.tobs), func.avg(measurement.tobs), func.max(measurement.date = start).filter(measurement <= end).all())\u001b[0m\n\u001b[0m                                                                                            ^\u001b[0m\n\u001b[0;31mSyntaxError\u001b[0m\u001b[0;31m:\u001b[0m keyword can't be an expression\n"
+     ]
+    }
+   ],
+   "source": [
+    "@app.route(\"/api/v1.0/dates\")\n",
+    "\n",
+    "def temp_at_dates(start, end):\n",
+    "#     results = session.query(func.min(measurement.tobs), func.avg(measurement.tobs), func.max(measurement.date = start).filter(measurement <= end).all())\n",
+    "#     session.close()\n",
+    "#     temp_at_dates_data = []\n",
+    "#     for temp in results:\n",
+    "#         temp_at_dates_dict = {}\n",
+    "#         temp_at_dates_dict[\"Start Date\"] = start\n",
+    "#         temp_at_dates_dict[\"End Date\"] = end\n",
+    "#         temp_at_dates_dict[\"Min Temperature\"] = temp.min\n",
+    "#         temp_at_dates_dict[\"Avg Temperature\"] = temp.avg\n",
+    "#         temp_at_dates_dict[\"Max Temperature\"] = temp.max\n",
+    "#         temp_at_dates_data.append(temp_at_dates_dict)\n",
+    "#     return jsonify(temp_at_dates_data)"
    ]
   },
   {
@@ -129,12 +194,7 @@
    "execution_count": null,
    "metadata": {},
    "outputs": [],
-   "source": [
-    "@app.route(\"/api/v1.0/tobs\")\n",
-    "\n",
-    "def tobs():\n",
-    "    results = session.query(measurement.date, measurement.tobs).filter(measurement.date)"
-   ]
+   "source": []
   }
  ],
  "metadata": {
