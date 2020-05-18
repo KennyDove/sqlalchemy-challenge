@@ -83,13 +83,57 @@
   },
   {
    "cell_type": "code",
+   "execution_count": 42,
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "SyntaxError",
+     "evalue": "unexpected EOF while parsing (<ipython-input-42-bb4f83f6698e>, line 11)",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[0;36m  File \u001b[0;32m\"<ipython-input-42-bb4f83f6698e>\"\u001b[0;36m, line \u001b[0;32m11\u001b[0m\n\u001b[0;31m    return jsonify(pricipitation_data\u001b[0m\n\u001b[0m                                     ^\u001b[0m\n\u001b[0;31mSyntaxError\u001b[0m\u001b[0;31m:\u001b[0m unexpected EOF while parsing\n"
+     ]
+    }
+   ],
+   "source": [
+    "@app.route(\"/api/v1.0/precipitation\")\n",
+    "def pricipitation():\n",
+    "    session = Sessions(engine)\n",
+    "    results = session.query(measurement.prcp, measuremnt.date).filter(measurement.date >= final_date).all()\n",
+    "    session.close()\n",
+    "    for date, prcp in results:\n",
+    "        pricipitation_dict = {}\n",
+    "        pricipitation_dict[\"prcp\"] = prcp\n",
+    "        pricipitation_dict[\"date\"] = date\n",
+    "        pricipitation_data.append(prcp_dict)\n",
+    "    return jsonify(pricipitation_data\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "@app.route(\"/api/v1.0/stations\")\n",
+    "\n",
+    "def stations():\n",
+    "    results = session.query(station.name, measurement.station).filter(station.station == measurement.station).group_by(station.name).all()\n",
+    "    stations_list =list(np.ravel(stations))\n",
+    "    return jsonify(station_list)\n",
+    "    session.close()"
+   ]
+  },
+  {
+   "cell_type": "code",
    "execution_count": null,
    "metadata": {},
    "outputs": [],
    "source": [
-    "@app.route(\"/api/v1.0/precipitation<br/>\")\n",
-    "def prcp():\n",
-    "    session = Sessions(engine)"
+    "@app.route(\"/api/v1.0/tobs\")\n",
+    "\n",
+    "def tobs():\n",
+    "    results = session.query(measurement.date, measurement.tobs).filter(measurement.date)"
    ]
   }
  ],
